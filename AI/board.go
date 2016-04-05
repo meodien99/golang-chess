@@ -277,7 +277,84 @@ func (b *Board) UndoMove(m *Move) {
 }
 
 
-
+// Modifies a bord in-place.
+// Forces a piece to a given square without checking move legality.
+func (b *Board) ForceMove(m *Move) {
+	for i, p := range b.Board {
+		if !p.Captured {
+			if m.Begin == p.Position {
+				b.Board[i].Position.X, b.Board[i].Position.Y = m.End.X, m.End.Y
+				
+				if m.Piece == 'p' {
+					if (p.Color == 1 && m.End.Y == 8 ) || (p.Color == -1 && m.End.Y == 1) {
+						if promotion := m.Promotion; promotion == 'q' {
+							b.Board[i].Name = promotion
+							b.Board[i].Directions = [][2]int{
+								{1, 1},
+								{1, 0},
+								{1, -1},
+								{0, 1},
+								{0, -1},
+								{-1, 1},
+								{-1, 0},
+								{-1, -1},
+							}
+							b.Board[i].Infinite_direction = true
+						} else if promotion == 'r' {
+							b.Board[i].Name = promotion
+							b.Board[i].Directions = [][2]int {
+								{1, 0},
+								{-1, 0},
+								{0, 1},
+								{0, -1},
+							}
+							b.Board[i].Infinite_direction = true
+						} else if promotion == 'n' {
+							b.Board[i].Name = promotion
+							b.Board[i].Directions = [][2]int {
+								{1, 2},
+								{-1, 2},
+								{1, -2},
+								{-1, -2},
+								{2, 1},
+								{-2, 1},
+								{2, -1},
+								{-2, -1},
+							}
+						} else if promotion == 'b' {
+							b.Board[i].Name = promotion
+							b.Board[i].Directions = [][2]int {
+								{1, 1},
+								{1, -1},
+								{-1, 1},
+								{-1, -1},
+							}
+							b.Board[i].Infinite_direction = true
+						}
+					}
+				} else if m.Piece == 'k' {
+					if m.Begin.X == 5 && (m.End.X == 3 || m.End.X == 7) && ((p.Color == 1 && m.Begin.Y == 1) || (p.Color == -1 && m.Begin.Y == 8)) {
+						// if king trying to castle
+						for i, p := range b.Board {
+							if p.Name == 'r' && p.Color == b.Turn && !p.Captured && p.Position.Y == m.Begin.Y {
+								if m.End.X == 3 && p.Position.X == 1 {
+									b.Board[i].Position.X = 4
+									break
+								} else if m.End.X == 7 && p.Position.X == 8 {
+									b.Board[i].Position.X = 6
+									break
+								}
+							}
+						}
+					}
+				}
+			} else if p.Position.X == m.End.X && p.Position.Y == m.End.Y {
+				b.Board[i].Captured = true
+			}
+		}
+	}
+	b.Turn *= -1
+}
 
 
 

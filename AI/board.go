@@ -8,12 +8,35 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"errors"
 )
 
 type Board struct {
 	Board []*Piece // all of piece on board
 	Turn int // 1: white, -1: black
 }
+
+
+/*
+	Return the color of the piece that occupies a given square
+	If the square is empty, returns 0
+	If the square is outside of the bounds of the board, returns -2
+*/
+func (b *Board) Occupied(s *Square) (int, byte) {
+	var capture byte
+	if !(1 <= s.X && s.X <= 8 && 1 <= s.Y && s.Y <= 8){
+		return -2, capture
+	}
+	
+	for _, p := range b.Board {
+		if p.Position.X == s.X && p.Position.Y == s.Y && !p.Captured {
+			return p.Color, p.Name
+		}
+	}
+	
+	return 0, capture
+}
+
 
 //Convert board to array of string, ready for printing or conversion to FEN
 func (b *Board) ToArray() (boardArray [8][8]string) {
@@ -30,6 +53,7 @@ func (b *Board) ToArray() (boardArray [8][8]string) {
 	}
 	return
 }
+
 
 func (b *Board) PrintBoard(){
 	boardArray := b.ToArray()
@@ -169,6 +193,88 @@ func (b *Board) can_castle(side int) bool {
 	return true
 }
 
+func (b *Board) castleHandler(m *Move, side int) error {
+	var rookIndex int
+	var kingIndex int
+	
+	if b.Turn == 1 {
+		kingIndex = 0
+	} else {
+		kingIndex = 1
+	}
+	
+	for i, p := range b.Board {
+		if p.Name == 'r' && side == p.Position.X {
+			rookIndex = i
+			break
+		}
+	}
+	
+	if rookIndex == 0 {
+		return errors.New("func castleHandler: should have found rook")
+	}
+	
+	b.Board[kingIndex].Position = m.End
+	if side == 8 {
+		b.Board[rookIndex].Position.X = 6
+	}
+	
+	if side == 1 {
+		b.Board[rookIndex].Position.X = 4
+	}
+	
+	return nil
+}
+
+
+// Modifies a board in-place to undo a given move
+func (b *Board) UndoMove(m *Move) {
+	var pieceAdded bool
+	var pieceMoved bool
+	
+	for i,p := range b.Board {
+		if p.Position == m.End {
+			if p.Color == b.Turn*-1{
+				if !pieceMoved && !p.Captured {
+					b.Board[i].Position = m.Begin
+					pieceMoved = true
+					
+					if m.Piece == 'p' && b.Board[i].Name != 'p' {
+						//undo pawn promotion
+						b.Board[i].Name = 'p'
+						b.Board[i].Infinite_direction = false
+						b.Board[i].Directions = [][2]int{
+							{0, 1 * p.Color},
+						}
+					}
+				} else if m.Piece == 'k' {
+					// undo castle
+					if m.Begin.X == 5 && (m.End.X == 3 || m.End.X == 7) && ((p.Color == 1 && m.Begin.Y == 1) || (p.Color == -1 && m.Begin.Y == 8)){
+						
+						for i, p := range b.Board {
+							if p.Name == 'r' && p.Color == b.Turn*-1 && !p.Captured && p.Position.Y == m.Begin.Y {
+								if m.End.X == 3 && p.Position.X == 4 {
+									b.Board[i].Position.X = 1
+									break
+								} else if m.End.X == 7 && p.Position.X == 6 {
+									b.Board[i].Position.X = 8
+									break
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if p.Captured && p.Name == m.Capture && !pieceAdded {
+					b.Board[i].Captured = false
+					pieceAdded = true
+				}
+			}
+		}
+	}
+	
+	b.Turn*= -1
+}
 
 
 

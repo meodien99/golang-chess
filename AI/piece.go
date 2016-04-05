@@ -24,7 +24,68 @@ type Piece struct {
 	Ex: A rook is attacking its own pawn next to it, but a pawn is not attacking a piece directly in front end of it
 */
 func (p *Piece) Attacking(s *Square, b *Board) bool {
-	return
+	if p.Captured {
+		return false
+	}
+	
+	if p.Name == 'p' {
+		captures := [2][2]int{{1, 1*p.Color}, {-1, 1*p.Color}}
+		for _, capture := range captures {
+			if s.X == p.Position.X + capture[0] && s.Y == p.Position.Y + capture[1]{
+				return true
+			}
+		}
+		
+		return false
+	}
+	
+	if p.Infinite_direction {
+		direction := [2]int{0, 0}
+		if s.X > p.Position.X {
+			direction[0] = 1
+		} else if s.X < p.Position.X {
+			direction[0] = -1
+		}
+		
+		if s.Y > p.Position.Y {
+			direction[1] = 1
+		} else if s.Y < p.Position.y {
+			direction[1] = -1
+		}
+		
+		var directionFound bool
+		
+		for _, d := range p.Directions {
+			if d[0] == direction[0] && d[1] == direction[1] {
+				directionFound = true
+				break
+			}
+		}
+		
+		if !directionFound {
+			return false
+		}
+		
+		for i := 1; i < 8; i++ {
+			x, y := p.Position.X + i*direction[0], p.Position.Y + i*direction[1]
+			
+			if x == s.X && y == s.Y {
+				return true
+			}
+			
+			if o, _ := b.Occupied(&Square{X: x, Y: y}); o != 0 {
+				return false
+			}
+		}
+	} else {
+		for _, direction := range p.Directions {
+			if s.X == p.Position.X + direction[0] && s.Y == p.Position.Y + direction[1] {
+				return true
+			}
+		}
+	}
+	
+	return true
 }
 
 
@@ -202,9 +263,9 @@ func (p *Piece) legalMoves(b *Board, check bool) []*Move {
 								X: p.Position.X + val[0],
 								Y: p.Position.Y + p.Color,
 							}
-							m := p.makeMoveTo(capturesquare.X, capturesquare.Y)
+							m := p.makeMoveTo(captureSquare.X, captureSquare.Y)
 							m.Capture = 'p'
-							if checkcheck {
+							if check {
 								if !moveIsCheck(b, m) {
 									legals = append(legals, m)
 								}
@@ -217,6 +278,7 @@ func (p *Piece) legalMoves(b *Board, check bool) []*Move {
 			}
 		}
 	}
+	
 	return legals
 }
 

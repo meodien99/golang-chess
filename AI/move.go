@@ -21,3 +21,8 @@ func (m *Move) CopyMove() *Move {
 	
 	return newMove
 }
+
+// Translate move to form "nb1-c3"
+func (m *Move) ToString() string {
+	return string(m.Piece) + m.Begin.ToString() + "-" + m.End.ToString()
+}

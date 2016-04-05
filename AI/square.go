@@ -9,26 +9,6 @@ var (
 	Ranks = []byte{'1','2','3','4','5','6','7','8'}
 )
 
-/*
-	Return the color of the piece that occupies a given square
-	If the square is empty, returns 0
-	If the square is outside of the bounds of the board, returns -2
-*/
-func (b *Board) Occupied(s *Square) (int, byte) {
-	var capture byte
-	if !(1 <= s.X && s.X <= 8 && 1 <= s.Y && s.Y <= 8){
-		return -2, capture
-	}
-	
-	for _, p := range b.Board {
-		if p.Position.X == s.X && p.Position.Y == s.Y && !p.Captured {
-			return p.Color, p.Name
-		}
-	}
-	
-	return 0, capture
-}
-
 // Takes a Square struct and convert it to common chess notation
 func (s *Square) ToString() string {
 	byteArray := [2]byte{Files[s.X - 1], Ranks[s.Y -1]}

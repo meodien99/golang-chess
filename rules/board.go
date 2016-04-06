@@ -238,19 +238,19 @@ func (b *Board) UndoMove(m *Move) {
 						b.Board[i].Directions = [][2]int{
 							{0, 1 * p.Color},
 						}
-					}
-				} else if m.Piece == 'k' {
-					// undo castle
-					if m.Begin.X == 5 && (m.End.X == 3 || m.End.X == 7) && ((p.Color == 1 && m.Begin.Y == 1) || (p.Color == -1 && m.Begin.Y == 8)) {
+					} else if m.Piece == 'k' {
+						// undo castle
+						if m.Begin.X == 5 && (m.End.X == 3 || m.End.X == 7) && ((p.Color == 1 && m.Begin.Y == 1) || (p.Color == -1 && m.Begin.Y == 8)) {
 
-						for i, p := range b.Board {
-							if p.Name == 'r' && p.Color == b.Turn*-1 && !p.Captured && p.Position.Y == m.Begin.Y {
-								if m.End.X == 3 && p.Position.X == 4 {
-									b.Board[i].Position.X = 1
-									break
-								} else if m.End.X == 7 && p.Position.X == 6 {
-									b.Board[i].Position.X = 8
-									break
+							for i, p := range b.Board {
+								if p.Name == 'r' && p.Color == b.Turn*-1 && !p.Captured && p.Position.Y == m.Begin.Y {
+									if m.End.X == 3 && p.Position.X == 4 {
+										b.Board[i].Position.X = 1
+										break
+									} else if m.End.X == 7 && p.Position.X == 6 {
+										b.Board[i].Position.X = 8
+										break
+									}
 								}
 							}
 						}
@@ -491,25 +491,24 @@ func (b *Board) Move(m *Move) error {
 			}
 		}
 	}
-	
+
 	b.Turn *= -1
-	
+
 	return nil
 }
-
 
 // Return all legal moves available to the player whose turn it is.
 func (b *Board) AllLegalMoves() []*Move {
 	legals := make([]*Move, 0)
-	
-	for _,p := range b.Board {
+
+	for _, p := range b.Board {
 		if p.Color == b.Turn {
 			for _, m := range p.legalMoves(b, true) {
 				legals = append(legals, m)
 			}
 		}
 	}
-	
+
 	return legals
 }
 
@@ -528,25 +527,25 @@ func (b *Board) IsOver() int {
 // Give a name, color, and coordinates, place the appropriate piece on the board
 // Does not add flags such as Can_castle, must be done manually
 func (b *Board) PlacePiece(name byte, color, x, y int) {
-	p := &Piece {
-		Name: name,
+	p := &Piece{
+		Name:  name,
 		Color: color,
-		Position: Square {
+		Position: Square{
 			X: x,
 			Y: y,
 		},
 	}
-	
+
 	if name == 'b' || name == 'r' || name == 'q' {
 		p.Infinite_direction = true
 	}
-	
+
 	if name == 'p' {
 		p.Directions = [][2]int{
 			{0, 1 * color},
 		}
 	} else if name == 'b' {
-		p.Directions = [][2]int {
+		p.Directions = [][2]int{
 			{1, 1},
 			{1, -1},
 			{-1, 1},
@@ -593,13 +592,13 @@ func (b *Board) PlacePiece(name byte, color, x, y int) {
 			{-1, -1},
 		}
 	}
-	
+
 	b.Board = append(b.Board, p)
 }
 
 func (b *Board) SetUpPieces() {
 	b.Board = make([]*Piece, 0)
-	
+
 	pawnRows := [2]int{2, 7}
 	pieceRows := [2]int{1, 8}
 	rookFiles := [2]int{1, 8}
@@ -607,7 +606,7 @@ func (b *Board) SetUpPieces() {
 	bishopFiles := [2]int{3, 6}
 	queenFile := 4
 	kingFile := 5
-	
+
 	for _, rank := range pieceRows {
 		//put the king first
 		var color int
@@ -616,11 +615,11 @@ func (b *Board) SetUpPieces() {
 		} else {
 			color = -1
 		}
-		
+
 		b.PlacePiece('k', color, kingFile, rank)
-		b.Board[len(b.Board) - 1].Can_castle = true
+		b.Board[len(b.Board)-1].Can_castle = true
 	}
-	
+
 	for _, rank := range pieceRows {
 		var color int
 		if rank == 1 {
@@ -628,24 +627,24 @@ func (b *Board) SetUpPieces() {
 		} else {
 			color = -1
 		}
-		
+
 		for _, file := range rookFiles {
 			b.PlacePiece('r', color, file, rank)
-			b.Board[len(b.Board) - 1].Can_castle = true
+			b.Board[len(b.Board)-1].Can_castle = true
 		}
-		
+
 		for _, file := range knightFiles {
 			b.PlacePiece('n', color, file, rank)
 		}
-		
+
 		for _, file := range bishopFiles {
 			b.PlacePiece('b', color, file, rank)
 		}
-		
+
 		//queen at last
 		b.PlacePiece('q', color, queenFile, rank)
 	}
-	
+
 	for _, rank := range pawnRows {
 		var color int
 		if rank == 2 {
@@ -653,21 +652,9 @@ func (b *Board) SetUpPieces() {
 		} else {
 			color = -1
 		}
-		
-		for file := 1; file <= 8; file ++ {
+
+		for file := 1; file <= 8; file++ {
 			b.PlacePiece('p', color, file, rank)
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-

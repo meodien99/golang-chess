@@ -56,7 +56,7 @@ func minInt(x, y int) int {
 
 // Return directions by piece
 func pieceDirections(name byte) [][2]int {
-	directions = make([][2]int, 0)
+	directions := make([][2]int, 0)
 	
 	if name == 'r' {
 		directions = [][2]int {

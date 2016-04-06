@@ -37,10 +37,10 @@ func (b *Board) Occupied(s *Square) (int, byte) {
 }
 
 //Convert board to array of string, ready for printing or conversion to FEN
-func (b *Board) ToArray() (boardArray [8][8]string) {
-	boardArray = [8][8]string{}
+func (b *Board) ToArray() [8][8]string {
+	boardArray := [8][8]string{}
 
-	for _, piece := range boardArray {
+	for _, piece := range b.Board {
 		if !piece.Captured {
 			if piece.Color == 1 {
 				boardArray[piece.Position.Y-1][piece.Position.X-1] = strings.ToUpper(string(piece.Name))
@@ -49,7 +49,7 @@ func (b *Board) ToArray() (boardArray [8][8]string) {
 			}
 		}
 	}
-	return
+	return boardArray
 }
 
 func (b *Board) PrintBoard() {
@@ -168,7 +168,7 @@ func (b *Board) can_castle(side int) bool {
 		return false
 	}
 
-	for i := minInt(b.Board[rookindex].Position.X, b.Board[kingindex].Position.X) + 1; i < maxInt(b.Board[rookindex].Position.X, b.Board[kingindex].Position.X); i++ {
+	for i := minInt(b.Board[rookIndex].Position.X, b.Board[kingIndex].Position.X) + 1; i < maxInt(b.Board[rookIndex].Position.X, b.Board[kingIndex].Position.X); i++ {
 		s := &Square{
 			X: i,
 			Y: b.Board[kingIndex].Position.Y,
@@ -601,7 +601,7 @@ func (b *Board) PlacePiece(name byte, color, x, y int) {
 	b.Board = append(b.Board, p)
 }
 
-func (b *Board) SetUpPieces(){
+func (b *Board) SetUpPieces() {
 	b.Board = make([]*Piece, 0)
 	
 	pawnRows := [2]int{2, 7}
@@ -625,7 +625,7 @@ func (b *Board) SetUpPieces(){
 		b.Board[len(b.Board) - 1].Can_castle = true
 	}
 	
-	for _, rank : range pieceRows {
+	for _, rank := range pieceRows {
 		var color int
 		if rank == 1 {
 			color = 1

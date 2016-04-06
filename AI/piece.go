@@ -7,7 +7,7 @@ package ai
 type Piece struct {
 	Position   Square
 	Color      int    // 1: white | -1: black
-	Name       string // [p]awn, k[n]ignt, [b]ishop, [r]ook, [q]ueen, [k]ing
+	Name       byte // [p]awn, k[n]ignt, [b]ishop, [r]ook, [q]ueen, [k]ing
 	Can_castle bool   // rooks and kings, default true, set to false when piece makes a non-castle move
 
 	Can_en_passant  bool // only applicable to pawns
@@ -49,7 +49,7 @@ func (p *Piece) Attacking(s *Square, b *Board) bool {
 		
 		if s.Y > p.Position.Y {
 			direction[1] = 1
-		} else if s.Y < p.Position.y {
+		} else if s.Y < p.Position.Y {
 			direction[1] = -1
 		}
 		
@@ -130,7 +130,7 @@ func (p *Piece) legalMoves(b *Board, check bool) []*Move {
 					Y: p.Position.Y + direction[1]*i,
 				}
 				
-				if o, capname := b.Occupied(s); o == -2 || o == p.Color {
+				if o, capname := b.Occupied(&s); o == -2 || o == p.Color {
 					break
 				} else if o == p.Color*-1{
 					m := p.makeMoveTo(s.X, s.Y)
@@ -180,7 +180,7 @@ func (p *Piece) legalMoves(b *Board, check bool) []*Move {
 					}
 				} else {
 					if check {
-						if !moveIsCheck(b. m) {
+						if !moveIsCheck(b, m) {
 							legals = append(legals, m)
 						}
 					} else {
@@ -253,7 +253,7 @@ func (p *Piece) legalMoves(b *Board, check bool) []*Move {
 			en_passants := [2][2]int{{1,0}, {-1, 0}}
 			for _, val := range en_passants {
 				s := Square{
-					X: p.Position + val[0],
+					X: p.Position.X + val[0],
 					Y: p.Position.Y,
 				}
 				if o,_ := b.Occupied(&s); o == p.Color*-1 {

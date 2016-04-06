@@ -1,1 +1,0 @@
-Package ai for searching algorithms suitable with chess's rule

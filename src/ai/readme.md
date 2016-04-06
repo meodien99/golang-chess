@@ -1,0 +1,1 @@
+Package ai is a Chess AI using rules engine package for searching algorithms suitable with chess's rule and handles both search and board evaluation

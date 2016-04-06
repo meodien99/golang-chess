@@ -1,7 +1,3 @@
-/*
-	Package rules implement the rules for playing chess
-*/
-
 package rules
 
 import (

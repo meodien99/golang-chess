@@ -38,7 +38,6 @@ func moveIsCheck(b *Board, m *Move) bool {
 
 
 
-
 func maxInt(x, y int) int {
 	if x > y {
 		return x
@@ -53,4 +52,60 @@ func minInt(x, y int) int {
 	}
 	
 	return y
+}
+
+// Return directions by piece
+func pieceDirections(name byte) [][2]int {
+	directions = make([][2]int, 0)
+	
+	if name == 'r' {
+		directions = [][2]int {
+			{1, 0},
+			{-1, 0},
+			{0, 1},
+			{0, -1},
+		}
+	} else if name == 'b' {
+		directions = [][2]int {
+			{1, 1},
+			{1, -1},
+			{-1, 1},
+			{-1, -1},
+		}
+	} else if name == 'k' {
+		directions = [][2]int {
+			{1, 1},
+			{1, 0},
+			{1, -1},
+			{0, 1},
+			{0, -1},
+			{-1, 1},
+			{-1, 0},
+			{-1, -1},
+		}
+	} else if name == 'q' {
+		directions = [][2]int {
+			{1, 1},
+			{1, 0},
+			{1, -1},
+			{0, 1},
+			{0, -1},
+			{-1, 1},
+			{-1, 0},
+			{-1, -1},
+		}
+	} else if name == 'n' {
+		directions = [][2]int {
+			{1, 2},
+			{-1, 2},
+			{1, -2},
+			{-1, -2},
+			{2, 1},
+			{-2, 1},
+			{2, -1},
+			{-2, -1},
+		}
+	}
+	
+	return directions
 }

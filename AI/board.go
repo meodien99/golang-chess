@@ -601,6 +601,68 @@ func (b *Board) PlacePiece(name byte, color, x, y int) {
 	b.Board = append(b.Board, p)
 }
 
+func (b *Board) SetUpPieces(){
+	b.Board = make([]*Piece, 0)
+	
+	pawnRows := [2]int{2, 7}
+	pieceRows := [2]int{1, 8}
+	rookFiles := [2]int{1, 8}
+	knightFiles := [2]int{2, 7}
+	bishopFiles := [2]int{3, 6}
+	queenFile := 4
+	kingFile := 5
+	
+	for _, rank := range pieceRows {
+		//put the king first
+		var color int
+		if rank == 1 {
+			color = 1
+		} else {
+			color = -1
+		}
+		
+		b.PlacePiece('k', color, kingFile, rank)
+		b.Board[len(b.Board) - 1].Can_castle = true
+	}
+	
+	for _, rank : range pieceRows {
+		var color int
+		if rank == 1 {
+			color = 1
+		} else {
+			color = -1
+		}
+		
+		for _, file := range rookFiles {
+			b.PlacePiece('r', color, file, rank)
+			b.Board[len(b.Board) - 1].Can_castle = true
+		}
+		
+		for _, file := range knightFiles {
+			b.PlacePiece('n', color, file, rank)
+		}
+		
+		for _, file := range bishopFiles {
+			b.PlacePiece('b', color, file, rank)
+		}
+		
+		//queen at last
+		b.PlacePiece('q', color, queenFile, rank)
+	}
+	
+	for _, rank := range pawnRows {
+		var color int
+		if rank == 2 {
+			color = 1
+		} else {
+			color = -1
+		}
+		
+		for file := 1; file <= 8; file ++ {
+			b.PlacePiece('p', color, file, rank)
+		}
+	}
+}
 
 
 

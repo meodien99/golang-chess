@@ -2,7 +2,7 @@
 	Piece
 */
 
-package ai
+package rules
 
 type Piece struct {
 	Position   Square

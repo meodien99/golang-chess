@@ -1,4 +1,4 @@
-package ai
+package rules
 
 //piece name + beginning end ending square
 type Move struct {

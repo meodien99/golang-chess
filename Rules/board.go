@@ -1,8 +1,8 @@
 /*
-	Package ai implement the rules for playing chess
+	Package rules implement the rules for playing chess
 */
 
-package ai
+package rules
 
 import (
 	"errors"

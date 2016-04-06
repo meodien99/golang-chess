@@ -1,4 +1,4 @@
-package ai
+package rules
 
 type Square struct {
 	X, Y int

@@ -1,4 +1,4 @@
-package ai
+package rules
 
 /*
 	Return true if a move places the mover in check

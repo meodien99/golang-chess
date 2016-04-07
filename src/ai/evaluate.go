@@ -4,8 +4,28 @@ import "chess"
 
 const (
 	DRAW float64 = 0
-	WHITEWIN float64 = 255
-	BLACKWIN float64 = -255
+	WHITEWIN float64		= 255
+	BLACKWIN float64		= -255
+	
+	KINGINCORNER			= .15  // king in a castled position
+	KINGONOPENFILE		= -.3  // king not protected by a pawn
+	KINGPROTECTED		= .1   // king protected by a pawn, applies to pawns on files near king
+
+	HUNGPIECE			= 0
+	ADVANCEDPAWN			= .075 // how far a pawn is from its starting rank
+	LONGPAWNCHAIN		= .03  // per pawn
+	ISOLATEDPAWN			= -.3
+	DOUBLEDPAWN			= -.4  // increases for tripled, etc. pawns
+	
+	PASSEDPAWN			= .75 // pawn has no opposing pawns blocking it from promoting
+	
+	CENTRALKNIGHT		= .5   // knight close to center of board
+	BISHOPSQUARES		= .125 // per square a bishop attacks
+	ROOKONSEVENTH		= .8   // rook is on the second to last rank relative to color
+	CONNECTEDROOKS		= .5   // both rooks share the same rank or file
+	
+	IMPORTANTSQUARE		= .28  // the central squares
+	WEAKSQUARE			= .03  // outer squares
 )
 
 var (
@@ -123,11 +143,102 @@ func EvalBoard(b *chess.Board) float64 {
 	return score
 }
 
+// Reward players for protecting their KING with pawns and being in corner
+func checkKingSafety(file int, pawns []chess.Square) float64 {
+	pawnArray := [8]int{}
+	for _, p := range pawns {
+		pawnArray[p.X - 1] += 1
+	}
+	
+	var score float64
+	for i := -1; i < 2; i++ {
+		if location := file + 1; location > -1 && location < 8 {
+			if pawnArray[location] == 0 {
+				score += KINGONOPENFILE
+			} else {
+				score += KINGPROTECTED
+			}
+		}
+	}
+	
+	if file == 1 || file == 2 || file == 7 || file == 8 {
+		score += KINGINCORNER
+	} else {
+		score -= KINGINCORNER
+	}
+	
+	return score
+}
 
+// Used in pawnStructureAnalysis to update a score given a discovered to be broken pawn chain
+func updatePawnChainScore(pawnChain int) float64 {
+	var score float64
+	if pawnChain > 2 {
+		score += float64(pawnChain) * LONGPAWNCHAIN
+	} else if pawnChain != 0 {
+		score += ISOLATEDPAWN / float64(pawnChain)
+	}
+	
+	return score
+}
 
+// Returns appropriate penalties for double and isolated  pawns
+func pawnStructureAnalysis(pawns []chess.Square, color int) {
+	pawnArray := [8]int{}
+	var score float64
+	
+	for _, p := range pawns {
+		pawnArray[p.X - 1] += 1
+		
+		if color == 1 {
+			score += float64(p.Y - 2) * ADVANCEDPAWN
+		} else {
+			score += float64(7 - p.Y) * ADVANCEDPAWN
+		}
+	}
+	
+	var pawnChain int
+	
+	for _, count := range pawnArray {
+		if count >= 2 {
+			score += float64(count) * DOUBLEDPAWN
+			pawnChain += 1
+		} else if count == 1 {
+			pawnChain += 1
+		} else if count == 0 {
+			score += updatePawnChainScore(pawnChain)
+			pawnChain = 0
+		}
+	}
+	
+	score += updatePawnChainScore(pawnChain)
+	
+	return score
+}
 
+func rookAnalysis(rooks []chess.Square) float64 {
+	if len(rooks) != 2 {
+		return 0
+	}
+	if rooks[0].X == rooks[1].X || rooks[0].Y == rooks[1].Y {
+		return CONNECTEDROOKS
+	}
+	
+	return 0
+}
 
-
+// Return wheter a given pawn has no opposing pawns blocking its path in any of its adjacent files
+func pawnIsPassed(pawn *chess.Piece, oppFullPawns []chess.Square) bool {
+	for _, p := range oppFullPawns {
+		if absInt(p.X - pawn.Position.X) <= 1 {
+			if (pawn.Color == 1 && p.Y > pawn.Position.Y) || (pawn.Color == -1 && p.Y < pawn.Position.Y) {
+				return false
+			}
+		}
+	}
+	
+	return true
+}
 
 
 

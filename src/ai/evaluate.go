@@ -92,7 +92,7 @@ func AttackRay(b *chess.Board, p *chess.Piece, dir [2]int) int {
 	if n:=1; n < 8; n++ {
 		s := &chess.Square{
 			X: p.Position.X + dir[0]*n,
-			Y: p.Position.Y + dir[0]*n,
+			Y: p.Position.Y + dir[1]*n,
 		}
 		
 		if ocuppied, _ := b.Occupied(s); ocuppied != 0 {
@@ -140,6 +140,80 @@ func EvalBoard(b *chess.Board) float64 {
 		}
 	}
 	
+	score += pawnStructureAnalysis(whitePawns, 1)
+	score -= pawnStructureAnalysis(blackPawns, -1)
+	
+	whiteRooks := []chess.Square{}
+	blackRooks := []chess.Square{}
+	
+	for _, piece := range b.Board {
+		if !piece.Captured {
+			if piece.Name != 'q' && piece.Name != 'k' {
+				if attackArray[piece.Position.X - 1][piece.Position.Y - 1] * piece.Color < 1 {
+					score += float64(piece.Color) * HUNGPIECE
+				}
+			}
+			
+			switch piece.Name {
+				case 'k':
+					if piece.Color == 1 {
+						score += checkKingSafety(piece.Position.X, whitePawns)
+					} else {
+						score -= checkKingSafety(piece.Position.X, blackPawns)
+					}
+				case 'p':
+					// reward passed pawn
+					if piece.Color == 1 {
+						if pawnIsPassed(piece, blackPawns){
+							score += PASSEDPAWN
+						} 
+					} else {
+						if pawnIsPassed(piece, whitePawns){
+							score -= PASSEDPAWN
+						}
+					}
+				case 'n':
+					if 3 <= piece.Position.X && piece.Position.X <= 6 && 3 <= piece.Position.Y && piece.Position.Y <= 6 {
+						score += float64(piece.Color) * CENTRALKNIGHT
+					}
+				case 'b':
+					var numAttacking int
+					for _, dir := range piece.Directions {
+						numAttacking += AttackRay(piece, b, dir)
+					}
+					score += float64(piece.Color*numAttacking) * BISHOPSQUARES
+				case 'r':
+					if (piece.Color == -1 && piece.Position.Y == 2) || (piece.Color == 1 && piece.Position.Y == 7){
+						score += float64(piece.Color) * ROOKONSEVENTH
+					}
+					is piece.Color == 1 {
+						whiteRooks = append(whiteRooks, piece.Position)
+					} else {
+						blackRooks = append(blackRooks, piece.Position)
+					}
+			}
+		}
+	}
+	score += rookAnalysis(whiteRooks)
+	score -= rookAnalysis(blackRooks)
+	
+	for x := 0; x < 8; x++ {
+		for y := 0; y < 8; y++ {
+			if attackArray[x][y] > 0 {
+				if x >= 2 && x <= 5 && y >= 2 && y <= 5 {
+					score += IMPORTANTSQUARE
+				} else {
+					score += WEAKSQUARE
+				}
+			} else if attackArray[x][y] < 0 {
+				if x >= 2 && x <= 5 && y >= 2 && y <= 5 {
+					score -= IMPORTANTSQUARE
+				} else {
+					score -= WEAKSQUARE
+				}
+			}
+		}
+	}
 	return score
 }
 

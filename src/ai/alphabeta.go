@@ -2,7 +2,7 @@ package ai
 
 import (
 	"fmt"
-	"rules"
+	"chess"
 )
 
 const (

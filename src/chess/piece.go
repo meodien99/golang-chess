@@ -2,7 +2,7 @@
 	Piece
 */
 
-package rules
+package chess
 
 type Piece struct {
 	Position   Square

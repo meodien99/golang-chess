@@ -1,4 +1,4 @@
-package rules
+package chess
 
 type Square struct {
 	X, Y int

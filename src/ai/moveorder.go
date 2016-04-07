@@ -2,11 +2,11 @@ package ai
 
 import (
 	"sort"
-	"rules"
+	"chess"
 )
 
 // The following defines a type and functions such that the sort package can order move by thier score
-type ByScore []*rules.Move
+type ByScore []*chess.Move
 
 func (s ByScore) Len() int {
 	return len(s)
@@ -25,10 +25,10 @@ func (s ByScore) Less(i, j int) bool {
 // Examines all checks first, followed by captures, followed by good moves
 // "Good moves" are sorted by their board evaluation after they are played
 // If quiescence is set to true, then only checks and captures are returned
-func orderedMove(b *rules.Board, quiescence bool) []*rules.Move {
-	checks := make([]*rules.Move, 0)
-	captures := make([]*rules.Move, 0)
-	rests := make([]*rules.Move, 0)
+func orderedMove(b *chess.Board, quiescence bool) []*chess.Move {
+	checks := make([]*chess.Move, 0)
+	captures := make([]*chess.Move, 0)
+	rests := make([]*chess.Move, 0)
 	
 	for _, move := range b.AllLegalMoves(){
 		b.ForceMove(move)
@@ -49,10 +49,10 @@ func orderedMove(b *rules.Board, quiescence bool) []*rules.Move {
 		sort.Sort(sort.Reverse(ByScore(rests)))
 	}
 	
-	orderedMoves := make([]*rules.Move, len(checks) + len(captures) + len(rests))
+	orderedMoves := make([]*chess.Move, len(checks) + len(captures) + len(rests))
 	index := 0
 	
-	for _, l := range [][]*rules.Move{checks, captures, rests} {
+	for _, l := range [][]*chess.Move{checks, captures, rests} {
 		for _, m := range l {
 			m.Score = 0
 			orderedMoves[index] = m

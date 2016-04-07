@@ -1,4 +1,4 @@
-package rules
+package chess
 
 /*
 	Return true if a move places the mover in check

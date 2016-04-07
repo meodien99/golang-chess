@@ -1,4 +1,4 @@
-package rules
+package chess
 
 //piece name + beginning end ending square
 type Move struct {

@@ -80,7 +80,7 @@ func updateAttackArray(b *chess.Board, p *chess.Piece, a *[8][8]int){
 }
 
 // Measures how many square a piece can attack in a given direction
-func AttackRay(b *chess.Board, p *chess.Piece, dir [2]int) int {
+func AttackRay(p *chess.Piece, b *chess.Board, dir [2]int) int {
 	if p.Captured {
 		return 0
 	}
@@ -89,7 +89,7 @@ func AttackRay(b *chess.Board, p *chess.Piece, dir [2]int) int {
 		return 1
 	}
 	
-	if n:=1; n < 8; n++ {
+	for n:=1; n < 8; n++ {
 		s := &chess.Square{
 			X: p.Position.X + dir[0]*n,
 			Y: p.Position.Y + dir[1]*n,
@@ -186,7 +186,7 @@ func EvalBoard(b *chess.Board) float64 {
 					if (piece.Color == -1 && piece.Position.Y == 2) || (piece.Color == 1 && piece.Position.Y == 7){
 						score += float64(piece.Color) * ROOKONSEVENTH
 					}
-					is piece.Color == 1 {
+					if piece.Color == 1 {
 						whiteRooks = append(whiteRooks, piece.Position)
 					} else {
 						blackRooks = append(blackRooks, piece.Position)
@@ -257,7 +257,7 @@ func updatePawnChainScore(pawnChain int) float64 {
 }
 
 // Returns appropriate penalties for double and isolated  pawns
-func pawnStructureAnalysis(pawns []chess.Square, color int) {
+func pawnStructureAnalysis(pawns []chess.Square, color int) float64{
 	pawnArray := [8]int{}
 	var score float64
 	

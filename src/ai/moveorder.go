@@ -25,7 +25,7 @@ func (s ByScore) Less(i, j int) bool {
 // Examines all checks first, followed by captures, followed by good moves
 // "Good moves" are sorted by their board evaluation after they are played
 // If quiescence is set to true, then only checks and captures are returned
-func orderedMove(b *chess.Board, quiescence bool) []*chess.Move {
+func orderedMoves(b *chess.Board, quiescence bool) []*chess.Move {
 	checks := make([]*chess.Move, 0)
 	captures := make([]*chess.Move, 0)
 	rests := make([]*chess.Move, 0)

@@ -34,7 +34,7 @@ After all, run :
 go build
 ```
 
-brower will be opened automatically (Linux & Mac) , if you are using others, simply execute the output file has compiled.
+brower will be opened immediately (Linux & Mac) , if you are using others, simply execute the output file has compiled.
 
 # Resources
   * [GoLang Documentation](http://golang.org/)

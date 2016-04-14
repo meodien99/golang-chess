@@ -24,7 +24,7 @@ Main project organization is inside `src/` directory, include :
 
 Folder `assets` contains all of files for displaying chess on browser (Thankfully [chessboardjs](http://chessboardjs.com/) for beautiful chess board, and [chessjs](https://github.com/jhlywa/chess.js) for validating piece movement in client-side).
 
-I'm used [mux](https://github.com/gorilla/mux) for handling AJAX request from Go, make sure that it's installed, if not, run cmd `go get` from your root directory, [see more details](https://golang.org/cmd/go/).
+I'm used [mux](https://github.com/gorilla/mux) for implementing requests router and dispatchers as well as handling AJAX request from Go, make sure that it's installed, if not, run cmd `go get` from your root directory, [see more details](https://golang.org/cmd/go/).
 
 # Testing 
 run `go test` inside root directory to ensure everything works
